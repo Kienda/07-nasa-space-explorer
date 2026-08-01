@@ -32,7 +32,17 @@ showRandomSpaceFact();
 setupDateInputs(startInput, endInput);
 
 const apiUrl = 'https://api.nasa.gov/planetary/apod';
+
+// js/config.js defines window.NASA_API_KEY. It is generated from .env for local
+// work and from the NASA_API_KEY repository secret during the Pages build, so
+// the key itself is never committed. Without it we fall back to NASA's shared
+// demo key, which is rate limited to a handful of requests per hour.
 const apiKey = window.NASA_API_KEY || 'DEMO_KEY';
+const usingDemoKey = apiKey === 'DEMO_KEY';
+
+if (usingDemoKey) {
+  console.warn('js/config.js is missing or did not set window.NASA_API_KEY. Falling back to DEMO_KEY.');
+}
 
 // Create the image-details modal once and reuse it for every gallery item.
 const modal = document.createElement('div');
@@ -233,8 +243,10 @@ async function getSpaceImages() {
   } catch (error) {
     console.error(error);
 
-    if (error.status === 429) {
-      showMessage("NASA's demo API request limit has been reached. Please try again later or use a personal NASA API key.");
+    if (error.status === 429 && usingDemoKey) {
+      showMessage("No NASA API key was loaded, so this page used NASA's shared demo key and hit its request limit. Add js/config.js with your own key and reload.");
+    } else if (error.status === 429) {
+      showMessage('Your NASA API key has hit its hourly request limit. Please try again in a little while.');
     } else {
       showMessage(`Unable to load space images. ${error.message}`);
     }

@@ -25,12 +25,26 @@ jobs:
         env:
           NASA_API_KEY: ${{ secrets.NASA_API_KEY }}
         run: |
-          test -n "$NASA_API_KEY"
+          # Strip any stray whitespace the secret may have been pasted with.
+          KEY=$(printf '%s' "$NASA_API_KEY" | tr -d '[:space:]')
+
+          if [ -z "$KEY" ]; then
+            echo "::error::The NASA_API_KEY repository secret is empty or unset."
+            exit 1
+          fi
+
+          case "$KEY" in
+            *=*)
+              echo "::error::NASA_API_KEY looks like a 'NAME = value' line. Store only the key value in the secret."
+              exit 1
+              ;;
+          esac
+
           mkdir -p _site/js _site/img
           cp index.html style.css _site/
           cp js/*.js _site/js/
           cp img/* _site/img/
-          printf "window.NASA_API_KEY = '%s';\n" "$NASA_API_KEY" > _site/js/config.js
+          printf "window.NASA_API_KEY = '%s';\n" "$KEY" > _site/js/config.js
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

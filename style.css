@@ -168,6 +168,48 @@ input:focus-visible {
 
 .gallery-section { padding-block: clamp(48px, 7vw, 88px); }
 
+.space-fact {
+  position: relative;
+  margin-bottom: clamp(40px, 6vw, 72px);
+  padding: clamp(24px, 5vw, 44px);
+  overflow: hidden;
+  border-left: 7px solid var(--nasa-red);
+  background: var(--nasa-blue-dark);
+  color: var(--white);
+}
+
+.space-fact::after {
+  content: "?";
+  position: absolute;
+  right: 18px;
+  bottom: -52px;
+  color: rgba(255, 255, 255, 0.08);
+  font: 800 clamp(9rem, 22vw, 15rem)/1 Inter, Helvetica, Arial, sans-serif;
+}
+
+.fact-label {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 12px;
+  color: #face00;
+  font-family: "DM Mono", monospace;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.fact-text {
+  position: relative;
+  z-index: 1;
+  max-width: 850px;
+  font-family: Inter, Helvetica, Arial, sans-serif;
+  font-size: clamp(1.35rem, 3.5vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+
 .section-heading {
   margin-bottom: 28px;
   padding-bottom: 20px;
@@ -206,12 +248,62 @@ input:focus-visible {
   outline-offset: 3px;
 }
 
-.gallery-item img {
+.gallery-item img,
+.video-placeholder {
   display: block;
   width: 100%;
   height: 220px;
   object-fit: cover;
   background: var(--surface);
+}
+
+.gallery-item img {
+  transition: transform 0.35s ease;
+}
+
+.gallery-item:hover img,
+.gallery-item:focus-visible img,
+.video-link:focus-visible img {
+  transform: scale(1.06);
+}
+
+.video-link {
+  position: relative;
+  display: block;
+  color: var(--white);
+  text-decoration: none;
+}
+
+.video-placeholder {
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: linear-gradient(135deg, #050609, var(--nasa-blue-dark));
+  font-family: Inter, Helvetica, Arial, sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.play-label {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  padding: 8px 12px;
+  background: var(--nasa-red);
+  font-size: 0.82rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.video-link:hover .play-label,
+.video-link:focus-visible .play-label {
+  background: #b72c17;
+}
+
+.video-link:focus-visible {
+  outline: 3px solid #face00;
+  outline-offset: -3px;
 }
 
 .gallery-item h2 {

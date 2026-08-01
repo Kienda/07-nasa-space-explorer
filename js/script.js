@@ -3,6 +3,27 @@ const startInput = document.getElementById('startDate');
 const endInput = document.getElementById('endDate');
 const getImagesButton = document.querySelector('.filters button');
 const gallery = document.getElementById('gallery');
+const spaceFactText = document.getElementById('space-fact-title');
+
+const spaceFacts = [
+  'A day on Venus is longer than a year on Venus.',
+  'Sunlight takes about eight minutes and twenty seconds to reach Earth.',
+  'More than one million Earths could fit inside the Sun by volume.',
+  'Neutron stars can spin hundreds of times every second.',
+  'The footprints left by Apollo astronauts could remain on the Moon for millions of years.',
+  'Olympus Mons on Mars is the largest known volcano in our solar system.',
+  'Saturn is less dense than water, although there is no ocean large enough to float it in.',
+  'The International Space Station circles Earth roughly once every ninety minutes.',
+  'Jupiter has the shortest day of any planet in our solar system—about ten hours.',
+  'The Milky Way and Andromeda galaxies are expected to merge billions of years from now.',
+];
+
+function showRandomSpaceFact() {
+  const randomIndex = Math.floor(Math.random() * spaceFacts.length);
+  spaceFactText.textContent = spaceFacts[randomIndex];
+}
+
+showRandomSpaceFact();
 
 // Call the setupDateInputs function from dateRange.js
 // This sets up the date pickers to:
@@ -87,6 +108,46 @@ function showMessage(message) {
   gallery.appendChild(placeholder);
 }
 
+// Build a gallery card for an APOD video with a direct link to the source.
+function createVideoGalleryItem(item) {
+  const card = document.createElement('article');
+  card.className = 'gallery-item video-item';
+
+  const videoLink = document.createElement('a');
+  videoLink.className = 'video-link';
+  videoLink.href = item.url;
+  videoLink.target = '_blank';
+  videoLink.rel = 'noopener noreferrer';
+  videoLink.setAttribute('aria-label', `Watch ${item.title} (opens in a new tab)`);
+
+  if (item.thumbnail_url) {
+    const thumbnail = document.createElement('img');
+    thumbnail.src = item.thumbnail_url;
+    thumbnail.alt = '';
+    thumbnail.loading = 'lazy';
+    videoLink.appendChild(thumbnail);
+  } else {
+    const videoPlaceholder = document.createElement('div');
+    videoPlaceholder.className = 'video-placeholder';
+    videoPlaceholder.textContent = 'NASA APOD Video';
+    videoLink.appendChild(videoPlaceholder);
+  }
+
+  const playLabel = document.createElement('span');
+  playLabel.className = 'play-label';
+  playLabel.innerHTML = '<span aria-hidden="true">▶</span> Watch video';
+  videoLink.appendChild(playLabel);
+
+  const title = document.createElement('h2');
+  title.textContent = item.title;
+
+  const date = document.createElement('p');
+  date.textContent = item.date;
+
+  card.append(videoLink, title, date);
+  return card;
+}
+
 // Build one gallery card for an APOD image.
 function createGalleryItem(item) {
   const card = document.createElement('article');
@@ -120,16 +181,20 @@ function createGalleryItem(item) {
 }
 
 function displayGallery(items) {
-  // Some APOD entries are videos, so only include entries with image URLs.
-  const images = items.filter((item) => item.media_type === 'image' && item.url);
+  const galleryItems = items.filter((item) => item.url).map((item) => {
+    if (item.media_type === 'video') {
+      return createVideoGalleryItem(item);
+    }
 
-  if (images.length === 0) {
-    showMessage('No space images were found for this date range.');
+    return createGalleryItem(item);
+  });
+
+  if (galleryItems.length === 0) {
+    showMessage('No APOD entries were found for this date range.');
     return;
   }
 
-  const cards = images.map(createGalleryItem);
-  gallery.replaceChildren(...cards);
+  gallery.replaceChildren(...galleryItems);
 }
 
 async function getSpaceImages() {
@@ -148,6 +213,7 @@ async function getSpaceImages() {
     api_key: apiKey,
     start_date: startDate,
     end_date: endDate,
+    thumbs: 'true',
   });
 
   try {

@@ -32,7 +32,7 @@ showRandomSpaceFact();
 setupDateInputs(startInput, endInput);
 
 const apiUrl = 'https://api.nasa.gov/planetary/apod';
-const apiKey = 'DEMO_KEY';
+const apiKey = window.NASA_API_KEY || 'DEMO_KEY';
 
 // Create the image-details modal once and reuse it for every gallery item.
 const modal = document.createElement('div');

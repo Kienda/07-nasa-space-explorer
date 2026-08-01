@@ -220,14 +220,24 @@ async function getSpaceImages() {
     const response = await fetch(`${apiUrl}?${params}`);
 
     if (!response.ok) {
-      throw new Error(`NASA API request failed with status ${response.status}`);
+      const errorData = await response.json().catch(() => null);
+      const error = new Error(
+        errorData?.error?.message || `NASA API request failed with status ${response.status}`
+      );
+      error.status = response.status;
+      throw error;
     }
 
     const data = await response.json();
     displayGallery(Array.isArray(data) ? data : [data]);
   } catch (error) {
     console.error(error);
-    showMessage('Unable to load space images. Please try again later.');
+
+    if (error.status === 429) {
+      showMessage("NASA's demo API request limit has been reached. Please try again later or use a personal NASA API key.");
+    } else {
+      showMessage(`Unable to load space images. ${error.message}`);
+    }
   } finally {
     getImagesButton.disabled = false;
   }
